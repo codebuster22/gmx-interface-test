@@ -1,6 +1,7 @@
-import { ARBITRUM, ARBITRUM_TESTNET, AVALANCHE, AVALANCHE_FUJI } from "config/chains";
+import { ARBITRUM, ARBITRUM_TESTNET, AVALANCHE, AVALANCHE_FUJI, ETH_GOERLI, ETH_MAINNET } from "config/chains";
 import arbitrum from "img/ic_arbitrum_24.svg";
 import avalanche from "img/ic_avalanche_24.svg";
+import ethereum from "img/ic_ethereum_24.svg";
 import avalancheTestnet from "img/ic_avalanche_testnet_24.svg";
 
 import gmxIcon from "img/ic_gmx_40.svg";
@@ -11,6 +12,16 @@ import glpArbitrum from "img/ic_glp_arbitrum.svg";
 import glpAvax from "img/ic_glp_avax.svg";
 
 const ICONS = {
+  [ETH_MAINNET]: {
+    network: ethereum,
+    gmx: gmxIcon,
+    glp: glpIcon
+  },
+  [ETH_GOERLI]: {
+    network: ethereum,
+    gmx: gmxIcon,
+    glp: glpIcon
+  },
   [ARBITRUM]: {
     network: arbitrum,
     gmx: gmxArbitrum,

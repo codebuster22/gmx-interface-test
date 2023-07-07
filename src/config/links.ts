@@ -1,7 +1,10 @@
-import { ARBITRUM, AVALANCHE } from "config/chains";
+import { ARBITRUM, AVALANCHE, ETH_MAINNET } from "config/chains";
 import { TOKENS_BY_SYMBOL_MAP } from "./tokens";
 
 const oneInchTokensMap = {
+  [ETH_MAINNET]: {
+    BTC: "WBTC"
+  },
   [ARBITRUM]: {
     BTC: "WBTC",
   },
@@ -30,6 +33,9 @@ export function getLeaderboardLink(chainId) {
   }
   if (chainId === AVALANCHE) {
     return "https://www.gmx.house/avalanche/leaderboard";
+  }
+  if(chainId === ETH_MAINNET) {
+    return "https://www.gmx.house/ethereum/leaderboards"
   }
   return "https://www.gmx.house";
 }

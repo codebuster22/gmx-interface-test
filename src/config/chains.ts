@@ -8,6 +8,7 @@ const { parseEther } = ethers.utils;
 export const MAINNET = 56;
 export const TESTNET = 97;
 export const ETH_MAINNET = 1;
+export const ETH_GOERLI = 5;
 export const AVALANCHE = 43114;
 export const AVALANCHE_FUJI = 43113;
 export const ARBITRUM = 42161;
@@ -15,16 +16,17 @@ export const ARBITRUM_TESTNET = 421611;
 export const FEES_HIGH_BPS = 50;
 
 // TODO take it from web3
-export const DEFAULT_CHAIN_ID = ARBITRUM;
+export const DEFAULT_CHAIN_ID = ETH_MAINNET;
 export const CHAIN_ID = DEFAULT_CHAIN_ID;
 
-export const SUPPORTED_CHAIN_IDS = [ARBITRUM, AVALANCHE];
+export const SUPPORTED_CHAIN_IDS = [ETH_MAINNET, ARBITRUM, AVALANCHE];
 
 if (isDevelopment()) {
-  SUPPORTED_CHAIN_IDS.push(ARBITRUM_TESTNET, AVALANCHE_FUJI);
+  SUPPORTED_CHAIN_IDS.push(ETH_GOERLI, ARBITRUM_TESTNET, AVALANCHE_FUJI);
 }
 
 export const IS_NETWORK_DISABLED = {
+  [ETH_MAINNET]: false,
   [ARBITRUM]: false,
   [AVALANCHE]: false,
 };
@@ -32,6 +34,8 @@ export const IS_NETWORK_DISABLED = {
 export const CHAIN_NAMES_MAP = {
   [MAINNET]: "BSC",
   [TESTNET]: "BSC Testnet",
+  [ETH_MAINNET]: "ETH Mainnet",
+  [ETH_GOERLI]: "ETH Goerli",
   [ARBITRUM_TESTNET]: "ArbRinkeby",
   [ARBITRUM]: "Arbitrum",
   [AVALANCHE]: "Avalanche",
@@ -41,15 +45,18 @@ export const CHAIN_NAMES_MAP = {
 export const GAS_PRICE_ADJUSTMENT_MAP = {
   [ARBITRUM]: "0",
   [AVALANCHE]: "3000000000", // 3 gwei
+  [ETH_MAINNET]: "3000000000" // 3 gwei
 };
 
 export const MAX_GAS_PRICE_MAP = {
   [AVALANCHE]: "200000000000", // 200 gwei
+  [ETH_MAINNET]: "100000000000" // 100 gwei
 };
 
 export const HIGH_EXECUTION_FEES_MAP = {
   [ARBITRUM]: 3, // 3 USD
   [AVALANCHE]: 3, // 3 USD
+  [ETH_MAINNET]: 10 // 10 USD
 };
 
 const constants = {
@@ -64,6 +71,22 @@ const constants = {
   [TESTNET]: {
     nativeTokenSymbol: "BNB",
     defaultCollateralSymbol: "BUSD",
+    defaultFlagOrdersEnabled: true,
+    positionReaderPropsLength: 8,
+    v2: false,
+  },
+
+  [ETH_MAINNET]: {
+    nativeTokenSymbol: "ETH",
+    defaultCollateralSymbol: "USDC", // what is the native collateral token
+    defaultFlagOrdersEnabled: true,
+    positionReaderPropsLength: 8,
+    v2: false,
+  },
+
+  [ETH_GOERLI]: {
+    nativeTokenSymbol: "ETH",
+    defaultCollateralSymbol: "USDC", // what is the native collateral token
     defaultFlagOrdersEnabled: true,
     positionReaderPropsLength: 8,
     v2: false,
@@ -125,10 +148,12 @@ const constants = {
   },
 };
 
-const ALCHEMY_WHITELISTED_DOMAINS = ["gmx.io", "app.gmx.io"];
+// uses alchemy and the domain needs to be whitelisted on Alchemy
+const ALCHEMY_WHITELISTED_DOMAINS = ["gmx.io", "app.gmx.io"]; // todo: replace it with the forked app domain
 
 export const RPC_PROVIDERS = {
   [ETH_MAINNET]: ["https://rpc.ankr.com/eth"],
+  [ETH_GOERLI]: ["https://rpc.ankr.com/eth_goerli"],
   [MAINNET]: [
     "https://bsc-dataseed.binance.org",
     "https://bsc-dataseed1.defibit.io",
@@ -152,11 +177,35 @@ export const RPC_PROVIDERS = {
 };
 
 export const FALLBACK_PROVIDERS = {
+  [ETH_MAINNET]: [getAlchemyEthHttpUrl()],
   [ARBITRUM]: [getAlchemyHttpUrl()],
   [AVALANCHE]: ["https://avax-mainnet.gateway.pokt.network/v1/lb/626f37766c499d003aada23b"],
 };
 
 export const NETWORK_METADATA: { [chainId: number]: NetworkMetadata } = {
+  [ETH_MAINNET]: {
+    chainId: "0x" + ETH_MAINNET.toString(16),
+    chainName: "Ethereum Mainnet",
+    nativeCurrency: {
+      name: "ETH",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: RPC_PROVIDERS[ETH_MAINNET],
+    blockExplorerUrls: ["https://etherscan.io"],
+  },
+  [ETH_GOERLI]: {
+    chainId: "0x" + ETH_GOERLI.toString(16),
+    chainName: "Ethereum Goerli Testnet",
+    nativeCurrency: {
+      name: "gETH",
+      symbol: "gETH",
+      decimals: 18,
+    },
+    rpcUrls: RPC_PROVIDERS[ETH_GOERLI],
+    blockExplorerUrls: ["https://goerli.etherscan.io"],
+
+  },
   [MAINNET]: {
     chainId: "0x" + MAINNET.toString(16),
     chainName: "BSC",
@@ -260,6 +309,14 @@ export function getAlchemyHttpUrl() {
   return "https://arb-mainnet.g.alchemy.com/v2/EmVYwUw0N2tXOuG0SZfe5Z04rzBsCbr2";
 }
 
+// add get eth http url
+export function getAlchemyEthHttpUrl() {
+  if (ALCHEMY_WHITELISTED_DOMAINS.includes(window.location.host)) {
+    return "https://eth-mainnet.g.alchemy.com/v2/ha7CFsr1bx5ZItuR6VZBbhKozcKDY4LZ";
+  }
+  return "https://eth-mainnet.g.alchemy.com/v2/EmVYwUw0N2tXOuG0SZfe5Z04rzBsCbr2";
+}
+
 export function getAlchemyWsUrl() {
   if (ALCHEMY_WHITELISTED_DOMAINS.includes(window.location.host)) {
     return "wss://arb-mainnet.g.alchemy.com/v2/ha7CFsr1bx5ZItuR6VZBbhKozcKDY4LZ";
@@ -268,7 +325,9 @@ export function getAlchemyWsUrl() {
 }
 
 export function getExplorerUrl(chainId) {
-  if (chainId === 3) {
+  if(chainId === ETH_GOERLI) {
+    return "https://goerli.etherscan.io/"
+  } else if (chainId === 3) {
     return "https://ropsten.etherscan.io/";
   } else if (chainId === 42) {
     return "https://kovan.etherscan.io/";
